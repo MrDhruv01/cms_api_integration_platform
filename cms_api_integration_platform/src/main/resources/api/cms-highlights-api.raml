@@ -1,0 +1,99 @@
+#%RAML 1.0
+title: CMS Highlights API
+version: v1
+baseUri: /api
+
+securitySchemes:
+  client-id-enforcement:
+    type: x-client-id-enforcement
+    describedBy:
+      headers:
+        client_id:
+          type: string
+          required: true
+          description: Client ID issued by Anypoint Platform.
+        client_secret:
+          type: string
+          required: true
+          description: Client Secret issued by Anypoint Platform.
+
+securedBy:
+  - client-id-enforcement
+
+types:
+  Highlight:
+    type: object
+    properties:
+      field:
+        type: string
+        required: true
+      value:
+        type: string
+        required: true
+
+/cms:
+  /highlights:
+    get:
+      displayName: Get Highlights
+      description: Returns CMS highlights as field/value pairs.
+
+      responses:
+        200:
+          body:
+            application/json:
+              type: Highlight[]
+              example:
+                [
+                  {
+                    "field": "Founded",
+                    "value": "1861"
+                  },
+                  {
+                    "field": "Placement Rate",
+                    "value": "94%"
+                  },
+                  {
+                    "field": "Departments",
+                    "value": "38"
+                  },
+                  {
+                    "field": "Accreditation",
+                    "value": "NECHE, since 1954"
+                  },
+                  {
+                    "field": "President",
+                    "value": "Dr. Helena Marsh"
+                  },
+                  {
+                    "field": "Enrollment",
+                    "value": "4,820 students"
+                  },
+                  {
+                    "field": "Students",
+                    "value": "4820"
+                  }
+                ]
+
+        400:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Bad Request"
+                }
+
+        401:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Unauthorized"
+                }
+
+        500:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Internal Server Error"
+                }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="328fe988-24eb-46f6-8b65-71b319cb55ba" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="edd9fbf0-0ab7-43ae-ac5c-52b3e58d8d08" >
+		<http:request-connection protocol="HTTPS" />
+	</http:request-config>
+	<flow name="mule-session6-demoFlow" doc:id="0e8a084a-7ba4-4ace-a705-80e10d87b36a" >
+		<http:listener doc:name="Listener" doc:id="a83cefaf-7ea4-4c1d-a3c7-974e6642a5bf" config-ref="HTTP_Listener_config" path="/test"/>
+		<http:request method="GET" doc:name="Request" doc:id="110b8342-e8c6-45ff-80b3-143ca78be663" config-ref="HTTP_Request_configuration" url="https://api.openweathermap.org/data/2.5/weather">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	q : "Ajmer",
+	appid : "490685e85a71d499129ab39ad980f2e8"
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="e2dcdcf2-bac7-48cd-9b8b-647c784b598f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

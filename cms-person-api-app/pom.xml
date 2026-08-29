@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.mycompany</groupId>
+	<artifactId>cms-person-api-app</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>mule-application</packaging>
+
+	<name>cms-person-api-app</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<app.runtime>4.11.0</app.runtime>
+		<mule.maven.plugin.version>4.7.0</mule.maven.plugin.version>
+
+		<anypoint.uri>https://anypoint.mulesoft.com</anypoint.uri>
+		<anypoint.analytics.uri>https://analytics-ingest.anypoint.mulesoft.com</anypoint.analytics.uri>
+		<arm.targetType>serverGroup</arm.targetType>
+		<arm.target>RISLZone</arm.target>
+		<arm.environment>Sandbox</arm.environment>
+		<arm.applicationName>cms-person-api-app</arm.applicationName>
+		<arm.businessGroup />
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.5.0</version>
+				<executions>
+					<execution>
+						<id>require-build-properties</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireProperty>
+									<property>env</property>
+									<message>Pass -Denv=dev|uat|prod|local (or -Plocal / -Pdeploy-dev)</message>
+								</requireProperty>
+								<requireProperty>
+									<property>security.key</property>
+									<message>Pass -Dsecurity.key=your-decryption-key</message>
+								</requireProperty>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.2.0</version>
+			</plugin>
+			<plugin>
+				<groupId>org.mule.tools.maven</groupId>
+				<artifactId>mule-maven-plugin</artifactId>
+				<version>${mule.maven.plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<armDeployment>
+						<applicationName>${arm.applicationName}</applicationName>
+						<muleVersion>${app.runtime}</muleVersion>
+						<uri>${anypoint.uri}</uri>
+						<target>${arm.target}</target>
+						<targetType>${arm.targetType}</targetType>
+						<environment>${arm.environment}</environment>
+						<connectedAppClientId>${anypoint.clientId}</connectedAppClientId>
+						<connectedAppClientSecret>${anypoint.clientSecret}</connectedAppClientSecret>
+						<connectedAppGrantType>client_credentials</connectedAppGrantType>
+						<properties>
+							<env>${env}</env>
+							<security.key>${security.key}</security.key>
+							<anypoint.platform.client_id>${anypoint.clientId}</anypoint.platform.client_id>
+							<anypoint.platform.client_secret>${anypoint.clientSecret}</anypoint.platform.client_secret>
+							<anypoint.platform.base_uri>${anypoint.uri}</anypoint.platform.base_uri>
+							<anypoint.platform.analytics_base_uri>${anypoint.analytics.uri}</anypoint.platform.analytics_base_uri>
+						</properties>
+						<skipDeploymentVerification>false</skipDeploymentVerification>
+					</armDeployment>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>33.2.1-jre</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.16.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-http-connector</artifactId>
+			<version>1.11.3</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-sockets-connector</artifactId>
+			<version>1.2.7</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-apikit-module</artifactId>
+			<version>1.12.2</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mycompany</groupId>
+			<artifactId>cms-domain-app</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<classifier>mule-domain</classifier>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>anypoint-exchange-v3</id>
+			<name>Anypoint Exchange</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases Repository</name>
+			<url>https://repository.mulesoft.org/releases/</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+			<layout>default</layout>
+		</pluginRepository>
+		<pluginRepository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases Repository</name>
+			<layout>default</layout>
+			<url>https://repository.mulesoft.org/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+</project>

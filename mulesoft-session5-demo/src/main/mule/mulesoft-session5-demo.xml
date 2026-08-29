@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="94f03a11-acf1-4599-8730-662c62c5b704" >
+		
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="mulesoft-session5-demoFlow" doc:id="b3ff6f93-dea1-4ee6-b027-21ae1ca611ed" >
+		<http:listener doc:name="Listener" doc:id="3959597f-1203-4cf1-9f0e-347cff7477ea" path="/test" config-ref="HTTP_Listener_config"/>
+		<ee:transform doc:name="Transform Message" doc:id="62341381-8c24-4eab-9c4f-a7a39bca118e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+var a = [
+	{
+		name: "sravan",
+		id: 100,
+		Maths: 56,
+		English: 23,
+		Phsyics: 56
+	},
+	{
+		name: "Dhruv",
+		id: 223,
+		Maths: 56,
+		English: 23,
+		Phsyics: 56
+	},
+	{
+		name: "Subhu",
+		id: 323,
+		Maths: 56,
+		English: 23,
+		Phsyics: 56
+	}
+]
+
+fun checkResult(marks) = if(marks > 50) "Pass" else "Fail"
+---
+a map (item, index) -> {
+	"Candidate": item.name,
+	"Roll no": item.id,
+	"SubjectWiseDetails": {
+		"Maths": {
+			marks: item.Maths, 
+			status: checkResult(item.Maths)
+		},
+		"English": {
+			marks: item.English, 
+			status: checkResult(item.English)
+		},
+		"Physics": {
+			marks: item.Phsyics, 
+			status: checkResult(item.Phsyics)
+		}
+	}
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

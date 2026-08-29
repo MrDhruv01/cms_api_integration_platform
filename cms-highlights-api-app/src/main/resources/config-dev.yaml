@@ -1,0 +1,9 @@
+http:
+  port: "8081"
+
+cms:
+  host: "cms.indicrm.io"
+  port: "443"
+  protocol: "HTTPS"
+  path:
+    highlights: "/cms/highlights/all"

@@ -1,0 +1,37 @@
+#%RAML 1.0
+title: Session-2
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/2c5856b9-3baf-473e-9997-d9560acab5b4
+
+types:
+  newsDataType: !include schemas/dataType.raml
+
+/search:
+  get:
+    queryParameters:
+      keyword:
+        type: string
+        minLength: 3
+        maxLength: 10
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include example/searchExample.raml
+              
+/news:
+  post:
+    queryParameters:
+      country:
+        required: false
+    body:
+      application/json:
+        type: newsDataType
+          
+    responses:
+      200:
+          body:
+            application/json:
+              examples: !include example/searchExample.raml
+                
+
+    

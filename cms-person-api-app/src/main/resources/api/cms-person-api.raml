@@ -1,0 +1,123 @@
+#%RAML 1.0
+title: CMS Person API
+version: v1
+baseUri: /api
+
+securitySchemes:
+  client-id-enforcement:
+    type: x-client-id-enforcement
+    describedBy:
+      headers:
+        client_id:
+          type: string
+          required: true
+          description: Client ID issued by Anypoint Platform.
+        client_secret:
+          type: string
+          required: true
+          description: Client Secret issued by Anypoint Platform.
+
+securedBy:
+  - client-id-enforcement
+
+types:
+  Person:
+    type: object
+    properties:
+      full_name:
+        type: string
+        required: true
+      design:
+        type: string
+        required: true
+      department:
+        type: string
+        required: true
+      subjects:
+        type: string[]
+        required: true
+      email:
+        type: string
+        required: true
+
+/cms:
+  /person:
+    get:
+      displayName: Get People
+      description: Returns the list of people from the CMS.
+
+      responses:
+        200:
+          body:
+            application/json:
+              type: Person[]
+              example:
+                [
+                  {
+                    "full_name": "Dr. Neha Sharma",
+                    "design": "Professor of Computer Science",
+                    "department": "Computer Science",
+                    "subjects": [
+                      "Data Structures",
+                      "Operating Systems",
+                      "Artificial Intelligence"
+                    ],
+                    "email": "neha.sharma@bharatuniversity.edu.in"
+                  },
+                  {
+                    "full_name": "Dinesh Sharma",
+                    "design": "Professor of Mathematics",
+                    "department": "Department of Mathematics",
+                    "subjects": [
+                      "Mathematical Modeling",
+                      "Numerical Analysis",
+                      "Research Methodology"
+                    ],
+                    "email": "dinesh.sharma@bharatuniversity.edu.in"
+                  },
+                  {
+                    "full_name": "Dr. Priya Raman",
+                    "design": "Professor of Economics",
+                    "department": "Dept. of Economics",
+                    "subjects": [
+                      "Behavioral Econ",
+                      "Public Policy"
+                    ],
+                    "email": "anirudh@ibirdsservices.com"
+                  },
+                  {
+                    "full_name": "Mr. Rahul Mehta",
+                    "design": "Training & Placement Officer",
+                    "department": "Training & Placement Cell",
+                    "subjects": [
+                      "Career Development",
+                      "Soft Skills",
+                      "Corporate Relations"
+                    ],
+                    "email": "rahul.mehta@bharatuniversity.edu.in"
+                  }
+                ]
+
+        400:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Bad Request"
+                }
+
+        401:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Unauthorized"
+                }
+
+        500:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Internal Server Error"
+                }

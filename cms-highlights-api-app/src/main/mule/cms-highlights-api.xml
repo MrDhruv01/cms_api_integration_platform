@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" 
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
+                          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+                          http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+                          http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <configuration-properties doc:name="Configuration properties" file="config-dev.yaml" />
+
+    <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration">
+        <http:request-connection host="${cms.host}" port="${cms.port}" protocol="${cms.protocol}">
+            <tls:context>
+                <tls:trust-store insecure="true" />
+            </tls:context>
+        </http:request-connection>
+    </http:request-config>
+
+    <flow name="get-cms-highlights-flow">
+        <http:listener config-ref="HTTP_Listener_config" path="/api/cms/highlights">
+            <http:response statusCode="#[vars.httpStatus default 200]" />
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+        </http:listener>
+
+        <logger level="INFO" doc:name="Log Request Start" message="Received request for Highlights API - CorrelationId: #[correlationId]" />
+        
+        <http:request method="GET" doc:name="Fetch Highlights" config-ref="HTTP_Request_configuration" path="${cms.path.highlights}"/>
+        
+        <ee:transform doc:name="Transform Highlights Payload">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload.items map (item) -> {
+    field: item.fields.label.value,
+    value: item.fields.value.value
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <logger level="INFO" doc:name="Log Request Success" message="Successfully fetched and transformed Highlights data - CorrelationId: #[correlationId]" />
+
+        <error-handler>
+            <on-error-propagate type="HTTP:CONNECTIVITY, HTTP:TIMEOUT" enableNotifications="true" logException="true">
+                <set-variable value="504" variableName="httpStatus"/>
+                <ee:transform doc:name="Upstream Timeout Response">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "statusCode": 504,
+    "error": "GATEWAY_TIMEOUT",
+    "message": "Upstream CRM backend is unreachable or timed out.",
+    "correlationId": correlationId
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </on-error-propagate>
+            
+            <on-error-propagate type="ANY" enableNotifications="true" logException="true">
+                <set-variable value="500" variableName="httpStatus"/>
+                <ee:transform doc:name="Generic Error Response">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "statusCode": 500,
+    "error": "INTERNAL_SERVER_ERROR",
+    "message": error.description default "An unexpected error occurred processing the request.",
+    "correlationId": correlationId
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+</mule>
