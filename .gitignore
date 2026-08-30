@@ -2,3 +2,6 @@
 **/target/ 
 .mule/ 
 **/.mule/ 
+
+**/cicd/environments/env.dev
+**/target/
